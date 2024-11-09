@@ -3,14 +3,18 @@
 #--------------------------------------------------------
 
 import numpy   as np
-import utility_etl  as ut
+from util import utility_etl  as ut
 
 # Load parameters from config.csv
 def config():
-    ...
+    param = np.genfromtxt('config.csv', delimiter=',', dtype=None,encoding='utf-8')
+    return param
 # Beginning ...
 def main():
-    config()            
+    param=config() 
+    ut.loadData()
+    ut.nMuestras(param[0])
+    ut.crearDataSet()
    
       
 if __name__ == '__main__':   

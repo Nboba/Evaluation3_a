@@ -1,7 +1,7 @@
 # Kernel-PCA by use Gaussian function
 
 import numpy as np
-import utility_kpca as ut
+from util import utility_kpca as ut
 
 # Gaussian Kernel
 def kernel_gauss():
