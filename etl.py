@@ -10,10 +10,9 @@ def config():
     param = np.genfromtxt('config.csv', delimiter=',', dtype=None,encoding='utf-8')
     return param
 # Beginning ...
-def main():
-    param=config() 
+def main(M=3000):
     ut.loadData()
-    ut.nMuestras(param[0])
+    ut.nMuestras(M)
     ut.crearDataSet()
    
       

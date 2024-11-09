@@ -64,9 +64,9 @@ def nMuestras(M):
     tipo3=[]
 
     for i in range(int(M)):
-        tipo1.append(np.random.randint(0, len(dataT1))+1)
-        tipo2.append(np.random.randint(0, len(dataT2))+1)
-        tipo3.append(np.random.randint(0, len(dataT3))+1)
+        tipo1.append(np.random.randint(0, len(dataT1)))
+        tipo2.append(np.random.randint(0, len(dataT2)))
+        tipo3.append(np.random.randint(0, len(dataT3)))
         
     np.savetxt("idx_class1.csv",np.array(tipo1).astype(int), delimiter=',', fmt='%i')
     np.savetxt("idx_class2.csv", np.array(tipo2).astype(int), delimiter=',', fmt='%i')
