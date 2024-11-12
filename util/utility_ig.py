@@ -17,40 +17,41 @@ def normData(X):
 
 
 def embbeddingData(X,param):
-    m= int(param[0])
+    X= X.flatten()
     N = len(X)
+    m= int(param[0])
     tau = int(param[1])
     c= int(param[2])
     M = int(N - (m - 1) * tau)
-    embeddings = [X[i:i + m * tau:tau] for i in range(M)]
-    Y = np.round(embeddings * c + 0.5).astype(int) 
-    print(Y)
-    return Y
+
+    #Se crea el embbeding
+    embeddings = np.array([X[i:i + m * tau:tau] for i in range(M)])
+    #Se mapea el embbeding
+    embeddingMap = np.round(embeddings * c + 0.5).astype(int) 
+    embeddingMap[embeddingMap < 1] = 1
+    embeddingMap[embeddingMap > c] = c
+    return embeddingMap
 
 
 
-def getPatron(Y,param):
+def getPatron(data,param):
     m= int(param[0])  # Longitud de cada embedding
     c = param[2]  # Constante utilizada en el paso 3
     # Crear el vector de potencias de c
-    powersOfC = np.array([c**i for i in range(m)])
-    patrones = [1 + np.dot(np.transpose(embedding) - 1, powersOfC) for embedding in Y]
+    cElevado_M = c ** np.arange(m)
+    patrones = 1 + np.dot( data- 1, cElevado_M)
     return patrones
 
-def getFrecuencia(patrones,param):
-    m= int(param[0]) 
-    c = int(param[2])
-    maxPatrones= c**m
-    frecuencias = np.zeros(maxPatrones, dtype=int)
-    for k in patrones:
-        k = int(round())  # Redondea y convierte a entero
-        frecuencias[k - 1] += 1
-    return frecuencias
+def getFrecuencia(patrones,N, param):
+    patronesUnicos, frecuencia = np.unique(patrones, return_counts=True)
+    probabilidades = frecuencia / frecuencia.sum()
+    return probabilidades
     
-def probDispercion(frecuencias,N,param):
-    m= param[0]
-    tau = param[1]
+def EntropyDispe(probabilidades,param):
+    DE = -np.sum(probabilidades * np.log2(probabilidades))
+    m= int(param[0])  # Longitud de cada embedding
+    c = param[2]
+    DENorm = DE / np.log2(c**m)
+    return DENorm
 
-    prob = frecuencias/(N-(m-1)*tau)
-    print(prob)
-    return prob
+
