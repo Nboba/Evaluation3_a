@@ -1,5 +1,5 @@
 import numpy as np
-import pprint
+from math import sqrt
 
 def config():
     param = np.genfromtxt('config.csv', delimiter=',', dtype=None,encoding='utf-8')
@@ -45,12 +45,12 @@ def entropyDataSet(X,param):
         patrones.append(patronesCarac)
     patrones=np.array(patrones)
     # Se obtienen las frecuencias, Paso 5 y 6
-    frecuenciaas=[]
+    frecuencias=[]
     for pat in patrones:
         patronesUnicos, frecuencia = np.unique(pat, return_counts=True)
         probabilidades = frecuencia / frecuencia.sum()
-        frecuenciaas.append(probabilidades)
-    frecuenciaas=np.array(frecuenciaas)
+        frecuencias.append(probabilidades)
+    frecuencias=np.array(frecuencias,dtype=object)
 
     # Se calcula la entropía de dispersión y se normaliza Paso 7
     DENorm=0
@@ -69,10 +69,11 @@ def entropyConditional(X,param):
     c= int(param[2])
 
     N = largo
-    M = int(N - (m - 1) * tau)
+    M = int(N - (m - 1) * tau)   
+    if N < 8:
+        return 0
+    embeddings = np.array([xT[i:i + m * tau:tau] for i in range(M)])
 
-    # Se realiza el Embedding y el mapeo, Paso 2 y 3
-    embeddings = np.array([X[i:i + m * tau:tau] for i in range(M)])
     embeddingMap = np.round(embeddings * c + 0.5).astype(int) 
     embeddingMap[embeddingMap < 1] = 1
     embeddingMap[embeddingMap > c **m] = c **m
@@ -91,3 +92,20 @@ def entropyConditional(X,param):
 
     return DENorm
     
+def getBins(data,N):
+    B = round(sqrt(N)) # Ajusta el número de bins
+
+    # Calcular los límites de los bins usando cuantiles
+    bins_edges=[]
+    aux =0
+    for i in range(B):
+        bins_edges.append([aux,(i+1) * (B -1)])
+        aux=((i+1) * (B -1)) + 1
+
+    bins_edges.append([aux, N-1])
+    X_bins=[]
+    for intervalos in bins_edges:
+        X_bins.append(data[intervalos[0]:intervalos[1]])
+
+    return np.array(X_bins,dtype=object)
+
