@@ -4,13 +4,13 @@ import numpy      as np
 from util import utility_ig    as ut
 
 # Dispersion entropy
-def entropy_disp(data,param,N): 
+def entropy_disp(data,param,conditionalFlag): 
     data = norm_data_sigmoidal(data)
-    Y=ut.embbeddingData(data,param)
-    patrones=ut.getPatron(Y,param)
-    frecuencias=ut.getFrecuencia(patrones,N,param)
-    DeNorm=ut.EntropyDispe(frecuencias,param)       
-    return DeNorm
+    if conditionalFlag == 0:  
+        return ut.entropyDataSet(data,param) 
+    else:
+        return ut.entropyConditional(data,param)
+
 
 def norm_data_sigmoidal(data):
     dataNorm = ut.normData(data)
@@ -24,7 +24,7 @@ def inform_gain():
     unique_labels, Y_encoded = np.unique(Y, return_inverse=True)
     N, d = data.shape  
     B= int(sqrt(N)) 
-    dataEntropy = entropy_disp(X,param,N)
+    dataEntropy = entropy_disp(X,param,0)
     IG_values = {}
     for feature_idx in range(d):
         x = data[:, feature_idx]
@@ -46,7 +46,7 @@ def inform_gain():
                 continue
             Y_j = Y_encoded[indices]
             largo= len(Y_j)
-            DE_Y_j = entropy_disp(Y_j,param,largo)
+            DE_Y_j = entropy_disp(Y_j,param,1)
             w_j = N_j / N
             Hy_given_x += w_j * DE_Y_j
 

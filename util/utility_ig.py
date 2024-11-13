@@ -16,42 +16,78 @@ def normData(X):
     return sigmoid(u)
 
 
-def embbeddingData(X,param):
-    X= X.flatten()
-    N = len(X)
+def entropyDataSet(X,param):
+    xT= X.transpose()
+    shape=xT.shape
+
     m= int(param[0])
     tau = int(param[1])
     c= int(param[2])
+
+    N = shape[1]
     M = int(N - (m - 1) * tau)
 
-    #Se crea el embbeding
+    embeddingsMap=[]
+    # Se realiza el Embedding y el mapeo, Paso 2 y 3
+    for carac in xT:
+        embeddings=np.array([carac[i:i + m * tau:tau] for i in range(M)])
+        embeddingMap = np.round(embeddings * c + 0.5).astype(int)
+        embeddingMap[embeddingMap < 1] = 1
+        embeddingMap[embeddingMap > c **m] = c **m
+        embeddingsMap.append(embeddingMap)
+    embeddingsMap = np.array(embeddingsMap)
+
+    # Se obtienen los patrones paso 4 y 5
+    cElevado_M = c ** np.arange(m)
+    patrones = []
+    for carac in embeddingsMap:
+        patronesCarac = 1 + np.dot(carac - 1, cElevado_M)
+        patrones.append(patronesCarac)
+    patrones=np.array(patrones)
+    # Se obtienen las frecuencias, Paso 5 y 6
+    frecuenciaas=[]
+    for pat in patrones:
+        patronesUnicos, frecuencia = np.unique(pat, return_counts=True)
+        probabilidades = frecuencia / frecuencia.sum()
+        frecuenciaas.append(probabilidades)
+    frecuenciaas=np.array(frecuenciaas)
+
+    # Se calcula la entropía de dispersión y se normaliza Paso 7
+    DENorm=0
+    for prob in probabilidades:
+        De = - np.sum(prob * np.log2(prob))
+        DENorm += De / np.log2(c**m)
+
+
+    return DENorm 
+
+def entropyConditional(X,param):
+    xT= X.transpose()
+    largo=len(xT)
+    m= int(param[0])
+    tau = int(param[1])
+    c= int(param[2])
+
+    N = largo
+    M = int(N - (m - 1) * tau)
+
+    # Se realiza el Embedding y el mapeo, Paso 2 y 3
     embeddings = np.array([X[i:i + m * tau:tau] for i in range(M)])
-    #Se mapea el embbeding
     embeddingMap = np.round(embeddings * c + 0.5).astype(int) 
     embeddingMap[embeddingMap < 1] = 1
-    embeddingMap[embeddingMap > c] = c
-    return embeddingMap
+    embeddingMap[embeddingMap > c **m] = c **m
 
-
-
-def getPatron(data,param):
-    m= int(param[0])  # Longitud de cada embedding
-    c = param[2]  # Constante utilizada en el paso 3
-    # Crear el vector de potencias de c
+    # Se obtienen los patrones paso 4 y 5
     cElevado_M = c ** np.arange(m)
-    patrones = 1 + np.dot( data- 1, cElevado_M)
-    return patrones
+    patrones = 1 + np.dot( embeddingMap- 1, cElevado_M)
 
-def getFrecuencia(patrones,N, param):
+    # Se obtienen las frecuencias, Paso 5 y 6
     patronesUnicos, frecuencia = np.unique(patrones, return_counts=True)
     probabilidades = frecuencia / frecuencia.sum()
-    return probabilidades
-    
-def EntropyDispe(probabilidades,param):
-    DE = -np.sum(probabilidades * np.log2(probabilidades))
-    m= int(param[0])  # Longitud de cada embedding
-    c = param[2]
-    DENorm = DE / np.log2(c**m)
+
+    # Se calcula la entropía de dispersión y se normaliza Paso 7
+    De = -np.sum(probabilidades * np.log2(probabilidades))
+    DENorm = De / np.log2(c**m)
+
     return DENorm
-
-
+    
