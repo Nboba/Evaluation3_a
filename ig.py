@@ -21,7 +21,6 @@ def inform_gain():
     data = load_data()
     X = data[:, :-1]  # Todas las columnas excepto la última
     Y = data[:, -1]
-    unique_labels, Y_encoded = np.unique(Y, return_inverse=True)
     N, d = X.shape  
     B= int(sqrt(N)) 
     dataEntropy = entropy_disp(X,param,0)
@@ -40,7 +39,7 @@ def inform_gain():
 
         Hy_given_x = 0
         for b in np.unique(x_bins):
-            indices = np.where(x_bins == b)[0]
+            indices = np.where(x == b)[0]
             N_j = len(indices)
             if N_j == 0:
                 continue
@@ -55,11 +54,10 @@ def inform_gain():
     sorted_features = sorted(IG_values.items(), key=lambda item: item[1], reverse=True)
 
     # Mostrar las variables ordenadas
-    print("Variables ordenadas por Ganancia de Información:")
     indices = []
     for feature_idx, IG in sorted_features:
         print(f"Característica {feature_idx}, Ganancia de Información: {IG}")
-        indices.append(feature_idx-1)
+        indices.append(feature_idx)
     topK=int(param[3])
     top_k_indices =  indices[0:topK]
     np.savetxt("Idx_variable.csv", top_k_indices, delimiter=',', fmt='%d')
