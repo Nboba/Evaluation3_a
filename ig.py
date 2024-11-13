@@ -17,16 +17,19 @@ def norm_data_sigmoidal(data):
     return  dataNorm
 #Information gain
 def inform_gain():
-    param=ut.config()
+    param = ut.config()
     data = load_data()
     X = data[:, :-1]  # Todas las columnas excepto la última
     Y = data[:, -1]
-    N, d = X.shape  
-    B= int(sqrt(N)) 
-    dataEntropy = entropy_disp(X,param,0)
+    N, d = X.shape
+    B = int(np.sqrt(N))  # Asegurarse de utilizar np.sqrt para evitar problemas con sqrt
+
+    # Calcula la entropía de dispersión de la variable objetivo Y
+    dataEntropy = entropy_disp(X , param, 0)
+
     IG_values = {}
     for feature_idx in range(d):
-        x = data[:, feature_idx]
+        x = X[:, feature_idx]  # Utilizar X en lugar de data para consistencia
 
         # Manejar valores NaN o infinitos
         x = np.nan_to_num(x)
@@ -39,18 +42,19 @@ def inform_gain():
 
         Hy_given_x = 0
         for b in np.unique(x_bins):
-            indices = np.where(x == b)[0]
+            indices = np.where(x_bins == b)[0]  # Usar x_bins en lugar de x
             N_j = len(indices)
             if N_j == 0:
                 continue
-            Y_j = x[indices]
-            DE_Y_j = entropy_disp(Y_j,param,1)
+            Y_j = Y[indices]  # Obtener los valores de Y correspondientes
+            DE_Y_j = entropy_disp(Y_j, param, 1)
             w_j = N_j / N
             Hy_given_x += w_j * DE_Y_j
 
         IG = dataEntropy - Hy_given_x
         IG_values[feature_idx] = IG
 
+    # Ordenar las características por ganancia de información
     sorted_features = sorted(IG_values.items(), key=lambda item: item[1], reverse=True)
 
     # Mostrar las variables ordenadas
@@ -58,14 +62,16 @@ def inform_gain():
     for feature_idx, IG in sorted_features:
         print(f"Característica {feature_idx}, Ganancia de Información: {IG}")
         indices.append(feature_idx)
-    topK=int(param[3])
-    top_k_indices =  indices[0:topK]
+
+    topK = int(param[3])
+    top_k_indices = indices[0:topK]
     np.savetxt("Idx_variable.csv", top_k_indices, delimiter=',', fmt='%d')
 
     # Crear el conjunto de datos X_K con solo las Top-K variables
     top_k = X[:, top_k_indices]
     data_top_k = np.column_stack((top_k, Y))  # Combina con la columna Y
     np.savetxt("DataIG.csv", data_top_k, delimiter=',', fmt='%f')
+
      
 
 # Load dataClass 
