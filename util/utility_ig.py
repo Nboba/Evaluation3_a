@@ -79,7 +79,6 @@ def entropyConditional(X, param):
     M = N - (m - 1) * tau
     if M < 1:
         return 1e-10
-    print('paso')
     embeddings = np.array([xT[i:i + (m - 1) * tau + 1:tau] for i in range(int(M))])
 
     # Normalizar los embeddings

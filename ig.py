@@ -43,7 +43,6 @@ def inform_gain():
             N_j = len(indices)
             if N_j == 0:
                 continue
-            print(f"carac nro:{feature_idx+1} :{N_j}")
             Y_j = x[indices]
             DE_Y_j = entropy_disp(Y_j,param,1)
             w_j = N_j / N
@@ -55,7 +54,6 @@ def inform_gain():
     sorted_features = sorted(IG_values.items(), key=lambda item: item[1], reverse=True)
 
     # Mostrar las variables ordenadas
-    print("Variables ordenadas por Ganancia de Información:")
     indices = []
     for feature_idx, IG in sorted_features:
         print(f"Característica {feature_idx}, Ganancia de Información: {IG}")
